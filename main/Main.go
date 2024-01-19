@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"path/filepath"
+	"strings"
 )
 
 func main() {
@@ -12,7 +13,7 @@ func main() {
 
 	fmt.Println("HTTP listening on " + config.ListenAddress)
 
-	fs := http.FileServer(noListFileSystem{http.Dir("./wwwroot")})
+	fs := http.FileServer(noListFileSystem{http.Dir("wwwroot")})
 
 	http.HandleFunc("/api/healthcheck", handleHealthCheck)
 	http.HandleFunc("/api/randomword", handleGetRandomWord)
@@ -59,7 +60,9 @@ func (nfs noListFileSystem) Open(path string) (http.File, error) {
 		it normally does: return the index.html in that dir.
 	*/
 	if s.IsDir() {
-		index := filepath.Join(path, "index.html")
+		// quick-and-dirty fix for windows platorm: convert the "\" separator
+		// to "/" that FileSystem requires for its paths. Should user URL join, tho.
+		index := strings.Replace(filepath.Join(path, "index.html"), `\`, `/`, -1)
 		if _, err := nfs.fs.Open(index); err != nil {
 			closeErr := f.Close()
 			if closeErr != nil {
