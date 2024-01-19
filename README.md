@@ -17,6 +17,10 @@ First, reads "./config.json", expecting, e.g.:
     }
 
 Second (overriding json, if present) attempts to set address from environment variable LISTEN_ADDRESS, e.g. exported like this:
-    $ ex[port LISTEN_ADDRESS=:80
+    $ export LISTEN_ADDRESS=:80
 
 Fallback default listen address is ":5090"
+
+v1.3.1
+Bugfix: on Windows platform, index.html url assembly accidentally used backslash 
+separator, resulting in HTTP 500 failure loading the index page.

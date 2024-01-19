@@ -34,14 +34,14 @@ type noListFileSystem struct {
 }
 
 /*
-Open() functon for noListFileSystem struct that wraps the normal fs.Open functionality.
-Inhibits the default FileServer "if it'a a directory without index.html,
+Open() function for noListFileSystem struct that wraps the normal fs.Open functionality.
+Inhibits the default FileServer "if it's a directory without index.html,
 show a directory listing" functionality.  With this, it will return a file not found
-error, which results instead in a client 404 not found rather than serving dir listing.
+error, which results in a client 404 NOT FOUND rather than offering dir listing.
 */
 func (nfs noListFileSystem) Open(path string) (http.File, error) {
 	/*
-		If neither file nor directory, just return error so http returns 404.
+		If neither existing file nor directory, just return error so http returns 404.
 	*/
 	f, err := nfs.fs.Open(path)
 	if err != nil {
@@ -56,12 +56,12 @@ func (nfs noListFileSystem) Open(path string) (http.File, error) {
 
 	/*
 		If entry is a directory, check if index.html exists. If not, cause
-		http to return a 494 error; if it does, just let http do what
+		http to return a 404 error; if it does, just let http do what
 		it normally does: return the index.html in that dir.
 	*/
 	if s.IsDir() {
-		// quick-and-dirty fix for windows platorm: convert the "\" separator
-		// to "/" that FileSystem requires for its paths. Should user URL join, tho.
+		// quick-and-dirty fix for windows platform: convert its "\" separator
+		// to "/" that FileSystem demands for its paths. Should use URL join, tho.
 		index := strings.Replace(filepath.Join(path, "index.html"), `\`, `/`, -1)
 		if _, err := nfs.fs.Open(index); err != nil {
 			closeErr := f.Close()
