@@ -27,7 +27,7 @@ func scoreLetter(guess string, answer string, position int) matchCode {
 // Pretend test word were the answer and see if the guess letters each score
 // the same. (If they do not, test word should be elininated from consideration
 // by the player based on the guess result colors.)
-func wouldTestWordResultInSameGuessScore(test string, answer string, guess string) bool {
+func doesTestWordResultInSameGuessScore(test string, answer string, guess string) bool {
 	if len(test) != len(answer) || len(test) != len(guess) {
 		// all words should be 5 letters, but test just in case
 		return false
@@ -45,13 +45,16 @@ func wouldTestWordResultInSameGuessScore(test string, answer string, guess strin
 
 func checkTestWordAgainstGuessList(test string, answer string, guessList []string) bool {
 	for _, g := range guessList {
-		if !wouldTestWordResultInSameGuessScore(test, answer, g) {
+		if !doesTestWordResultInSameGuessScore(test, answer, g) {
 			return false
 		}
 	}
 	return true
 }
 
+// Takes list of guesses the player has taken, and count the number of dictionary words
+// that would result in the same colors displayed to the user, i.e. possible
+// answers the user should choose from
 func CountMatches(answer string, guesses []string) int {
 	matchCount := 0
 

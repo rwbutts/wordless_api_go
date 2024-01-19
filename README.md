@@ -24,3 +24,6 @@ Fallback default listen address is ":5090"
 v1.3.1
 Bugfix: on Windows platform, index.html url assembly accidentally used backslash 
 separator, resulting in HTTP 500 failure loading the index page.
+
+v1.3.2
+refactor words.CountMatches() for simplicity
