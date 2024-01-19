@@ -31,9 +31,9 @@ type noListFileSystem struct {
 
 /*
 Open() functon for noListFileSystem struct that wraps the normal fs.Open functionality.
-Inhibits the defauk FileServer "if it'a a direectory without index.htm,
-show a directory listing "functionality.  With this, it will return a file not found
-error, which results instead in a 404 not found rather than serving dir listing.
+Inhibits the default FileServer "if it'a a directory without index.html,
+show a directory listing" functionality.  With this, it will return a file not found
+error, which results instead in a client 404 not found rather than serving dir listing.
 */
 func (nfs noListFileSystem) Open(path string) (http.File, error) {
 	/*
@@ -45,15 +45,15 @@ func (nfs noListFileSystem) Open(path string) (http.File, error) {
 	}
 
 	/*
-		It exists, see if its a directory. That's the case we're interested in
+		It exists, see if it's a directory. That's the case we're interested in
 		for special handling.
 	*/
 	s, _ := f.Stat()
 
 	/*
-		If entry is a directory, check if index,html exists. If not, let
-		http return a file not found error; if it does, just let http do what
-		it normally does, return the index.html in the dir.
+		If entry is a directory, check if index.html exists. If not, cause
+		http to return a 494 error; if it does, just let http do what
+		it normally does: return the index.html in that dir.
 	*/
 	if s.IsDir() {
 		index := filepath.Join(path, "index.html")
