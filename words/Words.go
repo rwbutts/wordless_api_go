@@ -4,39 +4,51 @@ import (
 	"strings"
 )
 
-func matchesYellow(testWord string, guessChar string, charIndex int) bool {
-	return !matchesGreen(testWord, guessChar, charIndex) && strings.Contains(testWord, guessChar)
+type matchCode int32
+
+const (
+	isMiss matchCode = iota
+	isElsewhere
+	isCorrect
+)
+
+// Compares a letter in guess with the answer and returns
+// matchCode indicating the score for the given guess letter position (0-4),
+func scoreLetter(guess string, answer string, position int) matchCode {
+	if guess[position] == answer[position] {
+		return isCorrect
+	} else if strings.Contains(answer, string(guess[position])) {
+		return isElsewhere
+	} else {
+		return isMiss
+	}
 }
 
-func matchesGreen(testWord string, guessChar string, charIndex int) bool {
-	return guessChar == string(testWord[charIndex])
-}
-
-func isWordCompatibleWithClues(testWord string, answer string, guess string) bool {
-
-	for i := 0; i < len(testWord); i++ {
-		c := string(guess[i])
-		if matchesGreen(answer, c, i) {
-			// guess character matched green against answer,
-			// but doesnt match green for testWord letter: eliminate
-			if !matchesGreen(testWord, c, i) {
-				return false
-			}
-		} else if matchesYellow(answer, c, i) {
-			// guess matches a letter elsewhere in answer,
-			// does it do so in testWord?
-			if !matchesYellow(testWord, c, i) {
-				return false
-			}
-		} else {
-			// letter c is not in answer. Is it in the Candidate?
-			// Reject if it is.
-			if strings.Contains(testWord, c) {
-				return false
-			}
-		}
+// Pretend test word were the answer and see if the guess letters each score
+// the same. (If they do not, test word should be elininated from consideration
+// by the player based on the guess result colors.)
+func wouldTestWordResultInSameGuessScore(test string, answer string, guess string) bool {
+	if len(test) != len(answer) || len(test) != len(guess) {
+		// all words should be 5 letters, but test just in case
+		return false
 	}
 
+	for i := 0; i < len(answer); i++ {
+		againstAnswer := scoreLetter(guess, answer, i)
+		againstTest := scoreLetter(guess, test, i)
+		if againstAnswer != againstTest {
+			return false
+		}
+	}
+	return true
+}
+
+func checkTestWordAgainstGuessList(test string, answer string, guessList []string) bool {
+	for _, g := range guessList {
+		if !wouldTestWordResultInSameGuessScore(test, answer, g) {
+			return false
+		}
+	}
 	return true
 }
 
@@ -45,17 +57,7 @@ func CountMatches(answer string, guesses []string) int {
 
 	for _, candidate := range WordList {
 
-		compatibleWithAll := true
-
-		for _, guess := range guesses {
-
-			if !isWordCompatibleWithClues(candidate, answer, guess) {
-				compatibleWithAll = false
-				break
-			}
-		}
-
-		if compatibleWithAll {
+		if checkTestWordAgainstGuessList(candidate, answer, guesses) {
 			matchCount++
 		}
 	}
