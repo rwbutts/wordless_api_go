@@ -7,3 +7,16 @@ Serves static content out of ./wwwroot, with default file of "index.html".
 
 v1.2.0
 Augment http.FileServer functionality to return 404 error when a directory listing would normally be returned by FileServer. Just for extra security.
+
+v1.3.0 
+Add HTTP listen configuration via config.json file or environment variable. 
+
+First, reads "./config.json", expecting, e.g.:
+    { 
+        "listenAddress" : ":8080" 
+    }
+
+Second (overriding json, if present) attempts to set address from environment variable LISTEN_ADDRESS, e.g. exported like this:
+    $ ex[port LISTEN_ADDRESS=:80
+
+Fallback default listen address is ":5090"

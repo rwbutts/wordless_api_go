@@ -1,13 +1,16 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"path/filepath"
 )
 
-const LISTEN_ADDRESS = ":5090"
-
 func main() {
+
+	config := GetConfig()
+
+	fmt.Println("HTTP listening on " + config.ListenAddress)
 
 	fs := http.FileServer(noListFileSystem{http.Dir("./wwwroot")})
 
@@ -18,7 +21,7 @@ func main() {
 	http.HandleFunc("/api/querymatchcount", handleMatchCount)
 	http.Handle("/", fs)
 
-	err := http.ListenAndServe(LISTEN_ADDRESS, nil)
+	err := http.ListenAndServe(config.ListenAddress, nil)
 	if err != nil {
 		panic(err.Error())
 	}
