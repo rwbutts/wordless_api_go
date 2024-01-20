@@ -13,6 +13,7 @@ const DEFAULT_LISTEN_ADDRESS = ":5090"
 
 type config struct {
 	ListenAddress string `json:"listenAddress" envconfig:"LISTEN_ADDRESS"`
+	LogFile       string `json:"logFile"`
 }
 
 func GetConfig() config {

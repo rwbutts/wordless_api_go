@@ -1,3 +1,4 @@
 {
-    "listenAddress" : ":5090"
+    "listenAddress" : ":5090",
+    "logFile" : ""
 }
