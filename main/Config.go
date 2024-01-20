@@ -9,11 +9,14 @@ import (
 )
 
 const CFG_JSON_FILE = "./config.json"
-const DEFAULT_LISTEN_ADDRESS = ":5090"
+const DEFAULT_LISTEN_ADDRESS = ":80"
 
 type config struct {
 	ListenAddress string `json:"listenAddress" envconfig:"LISTEN_ADDRESS"`
-	LogFile       string `json:"logFile"`
+
+	// Can be file path or "-" for stdout.
+	// "" or omitting the setting entirely disables logging
+	LogFile string `json:"logFile"`
 }
 
 func GetConfig() config {

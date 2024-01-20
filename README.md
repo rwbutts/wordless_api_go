@@ -27,3 +27,15 @@ separator, resulting in HTTP 500 failure loading the index page.
 
 v1.3.2
 refactor words.CountMatches() for simplicity
+
+v1.4
+add logging, and middleware to log HTTTP requests. 
+Now, config.json looks like this
+    { 
+        "listenAddress" : ":8080",
+        "logFile" : "-"
+    }
+logFile can be a file path or "-" to log to stdout.
+"" or omitting logFile setting entirely disables logging.
+
+Default listen address is now ":80"

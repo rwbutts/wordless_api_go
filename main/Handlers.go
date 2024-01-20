@@ -3,7 +3,6 @@ package main
 import (
 	//	"fmt"
 	"encoding/json"
-	"log"
 	"math/rand"
 	"net/http"
 	"regexp"
@@ -118,12 +117,8 @@ func sendJSON(w http.ResponseWriter, payload any) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonResp)
-}
 
-func LogMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		next.ServeHTTP(w, r)
-		log.Printf("%v %v %v", r.RemoteAddr, r.Method, r.RequestURI)
-	})
+	// Write header explicitly so it's available early for logging middleware
+	w.WriteHeader(200)
+	w.Write(jsonResp)
 }

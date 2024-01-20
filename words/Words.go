@@ -53,8 +53,8 @@ func checkTestWordAgainstGuessList(test string, answer string, guessList []strin
 }
 
 // Takes list of guesses the player has taken, and count the number of dictionary words
-// that would result in the same colors displayed to the user, i.e. possible
-// answers the user should choose from
+// that would result in the same colors displayed to the user, i.e. remaining
+// dictionary words that don't conflict with the guess results displayed
 func CountMatches(answer string, guesses []string) int {
 	matchCount := 0
 

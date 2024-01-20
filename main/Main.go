@@ -14,9 +14,11 @@ func main() {
 
 	config := GetConfig()
 
-	log.SetOutput(io.Discard)
-
-	if config.LogFile != "" {
+	if config.LogFile == "" {
+		log.SetOutput(io.Discard)
+	} else if config.LogFile == "-" {
+		log.SetOutput(os.Stdout)
+	} else {
 		logfile, err := os.OpenFile(config.LogFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 		if err != nil {
 			fmt.Printf("Warning: error opening log file %v: %v", config.LogFile, err.Error())
@@ -35,14 +37,16 @@ func main() {
 
 	fs := http.FileServer(noListFileSystem{http.Dir("wwwroot")})
 
-	mux.Handle("/api/healthcheck", LogMiddleware(http.HandlerFunc(handleHealthCheck)))
-	mux.Handle("/api/randomword", LogMiddleware(http.HandlerFunc(handleGetRandomWord)))
-	mux.Handle("/api/getword/", LogMiddleware(http.HandlerFunc(handleGetWord)))
-	mux.Handle("/api/checkword/", LogMiddleware(http.HandlerFunc(handleCheckWord)))
-	mux.Handle("/api/querymatchcount", LogMiddleware(http.HandlerFunc(handleMatchCount)))
-	mux.Handle("/", LogMiddleware(fs))
+	mux.HandleFunc("/api/healthcheck", handleHealthCheck)
+	mux.HandleFunc("/api/randomword", handleGetRandomWord)
+	mux.HandleFunc("/api/getword/", handleGetWord)
+	mux.HandleFunc("/api/checkword/", handleCheckWord)
+	mux.HandleFunc("/api/querymatchcount", handleMatchCount)
+	mux.Handle("/", fs)
 
-	err := http.ListenAndServe(config.ListenAddress, mux)
+	mw := LoggingMiddleware(log.Default())
+
+	err := http.ListenAndServe(config.ListenAddress, mw(mux))
 	if err != nil {
 		log.Println("PANIC : " + err.Error())
 		panic(err.Error())
