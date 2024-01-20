@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -13,6 +14,8 @@ func main() {
 
 	config := GetConfig()
 
+	log.SetOutput(io.Discard)
+
 	if config.LogFile != "" {
 		logfile, err := os.OpenFile(config.LogFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 		if err != nil {
@@ -23,7 +26,10 @@ func main() {
 		}
 	}
 
+	defer log.Println("Shutdown")
+
 	fmt.Println("HTTP listening on " + config.ListenAddress)
+	log.Println("HTTP listening on " + config.ListenAddress)
 
 	mux := http.NewServeMux()
 
@@ -38,9 +44,9 @@ func main() {
 
 	err := http.ListenAndServe(config.ListenAddress, mux)
 	if err != nil {
+		log.Println("PANIC : " + err.Error())
 		panic(err.Error())
 	}
-
 }
 
 type noListFileSystem struct {
