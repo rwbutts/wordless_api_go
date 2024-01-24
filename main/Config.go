@@ -8,34 +8,45 @@ import (
 	"github.com/kelseyhightower/envconfig"
 )
 
-const CFG_JSON_FILE = "./config.json"
-const DEFAULT_LISTEN_ADDRESS = ":80"
+const DEFAULT_PORT = "8080"
 
 type config struct {
-	ListenAddress string `json:"listenAddress" envconfig:"LISTEN_ADDRESS"`
+	Port string `json:"port" envconfig:"PORT"`
 
 	// Can be file path or "-" for stdout.
 	// "" or omitting the setting entirely disables logging
-	LogFile string `json:"logFile"`
+	LogFile string `json:"logFile" envconfig:"LOGFILE"`
 }
 
 func GetConfig() config {
 	var cfg config
+	var fname string
 
-	f, err := os.Open(CFG_JSON_FILE)
-	if err == nil {
-		defer f.Close()
-		err := json.NewDecoder(f).Decode(&cfg)
-		if err != nil {
-			fmt.Println("Warning: can't parse config file (ignoring): " + err.Error())
+	// get config from commandline first, fallback to try environment
+	if len(os.Args) > 2 {
+		fname = os.Args[1]
+	} else {
+		fname = os.Getenv("CONFIG")
+	}
+
+	if fname != "" {
+		f, err := os.Open(fname)
+		if err == nil {
+			defer f.Close()
+			err := json.NewDecoder(f).Decode(&cfg)
+			if err != nil {
+				fmt.Printf("Warning: can't parse config file %v (ignoring): %v", fname, err.Error())
+			}
+		} else {
+			fmt.Printf("Warning: can't open config file %v (ignoring): %v", fname, err.Error())
 		}
 	}
 
 	envconfig.Process("", &cfg)
 
 	// if all else fails, fallback to default
-	if cfg.ListenAddress == "" {
-		cfg.ListenAddress = DEFAULT_LISTEN_ADDRESS
+	if cfg.Port == "" {
+		cfg.Port = DEFAULT_PORT
 	}
 
 	return cfg

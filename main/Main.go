@@ -6,11 +6,26 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
-	"strings"
 )
 
+const EXENAME = "wordless"
+
 func main() {
+
+	if len(os.Args) > 1 && (os.Args[1] == "--help" || os.Args[1] == "-h" || os.Args[1] == "/?") {
+		fmt.Printf("Usage: %v [json config file]\n", EXENAME)
+		fmt.Println("\nSample file:")
+		fmt.Println("    {")
+		fmt.Println(`		  "port" : "8080"`)
+		fmt.Println(`		  "logfile" : "config.json"`)
+		fmt.Println("    }")
+		fmt.Println("\nConfig can also be set by the environment variables: PORT and LOGFILE.")
+		fmt.Println("Note: Environment variable has higher priority than config file")
+		fmt.Println("\nDefault port is 8080; default logfile = \"\" (no logging)")
+		fmt.Println(`To log to stdout, set logfile =  "-"`)
+
+		os.Exit(0)
+	}
 
 	config := GetConfig()
 
@@ -30,8 +45,8 @@ func main() {
 
 	defer log.Println("Shutdown")
 
-	fmt.Println("HTTP listening on " + config.ListenAddress)
-	log.Println("HTTP listening on " + config.ListenAddress)
+	fmt.Println("HTTP listening on :" + config.Port)
+	log.Println("HTTP listening on :" + config.Port)
 
 	mux := http.NewServeMux()
 
@@ -46,49 +61,9 @@ func main() {
 
 	mw := LoggingMiddleware(log.Default())
 
-	err := http.ListenAndServe(config.ListenAddress, mw(mux))
+	err := http.ListenAndServe(":"+config.Port, mw(mux))
 	if err != nil {
-		log.Println("PANIC : " + err.Error())
+		log.Println("PANIC ListenAndServe() exit: " + err.Error())
 		panic(err.Error())
 	}
-}
-
-type noListFileSystem struct {
-	fs http.FileSystem
-}
-
-// Open() function for noListFileSystem struct that wraps the normal fs.Open functionality.
-// Inhibits the default FileServer "if it's a directory without index.html,
-// show a directory listing" functionality.  With this, it will return a file not found
-// error, which results in a client 404 NOT FOUND rather than offering dir listing.
-func (nfs noListFileSystem) Open(path string) (http.File, error) {
-
-	// If neither existing file nor directory, just return error so http returns 404.
-	f, err := nfs.fs.Open(path)
-	if err != nil {
-		return nil, err
-	}
-
-	// It exists, see if it's a directory. That's the case we're interested in
-	// for special handling.
-	s, _ := f.Stat()
-
-	// If entry is a directory, check if index.html exists. If not, cause
-	// http to return a 404 error; if it does, just let http do what
-	// it normally does: return the index.html in that dir.
-	if s.IsDir() {
-		// quick-and-dirty fix for windows platform: convert its "\" separator
-		// to "/" that FileSystem demands for its paths. Should use URL join, tho.
-		index := strings.Replace(filepath.Join(path, "index.html"), `\`, `/`, -1)
-		if _, err := nfs.fs.Open(index); err != nil {
-			closeErr := f.Close()
-			if closeErr != nil {
-				return nil, closeErr
-			}
-
-			return nil, err
-		}
-	}
-
-	return f, nil
 }
