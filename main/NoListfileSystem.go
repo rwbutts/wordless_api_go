@@ -28,7 +28,7 @@ func (nfs noListFileSystem) Open(path string) (http.File, error) {
 
 	if err == nil && s.IsDir() {
 
-		// If entry is a directory, check if index.html exists.
+		// If entry is a directory, check if index.html exists by attempting Open().
 
 		// quick-and-dirty fix for windows platform: convert its "\" separator
 		// to "/" that FileSystem demands for its paths. Should use URL join, tho.
@@ -36,16 +36,17 @@ func (nfs noListFileSystem) Open(path string) (http.File, error) {
 
 		if findex, err := nfs.fs.Open(index); err != nil {
 
-			// presumably a File Not Found error is the cause. Close the diectory
-			// and let caller think it's Open() is the source of Not Found err.
+			// Presumably a File Not Found error is the cause. Close the directory
+			// and let caller think directory open is the source of Not Found err
+			// we are returning.
 			closeErr := f.Close()
 
-			// shouldn't fail, but just in caase
+			// shouldn't fail, but just in case, report the error whatever it is
 			if closeErr != nil {
 				return nil, closeErr
 			}
 
-			// Dir exists with no index file. Return Not Found rather than
+			// Dir exists with no index file. Return err Not Found rather than
 			// let dir listing be served
 			return nil, err
 
@@ -54,8 +55,8 @@ func (nfs noListFileSystem) Open(path string) (http.File, error) {
 			findex.Close()
 		}
 
-		// directory has Oepnable index.html. fall thru and let FileServer
-		// detect and return it to client instead of dir listing
+		// directory has Openable index.html. Fall thru and let FileServer
+		// do its normal thing: detect and return it to client instead of dir listing
 
 	}
 

@@ -18,27 +18,29 @@ type config struct {
 	LogFile string `json:"logFile" envconfig:"LOGFILE"`
 }
 
-func GetConfig() config {
+// Builds conf struct first from jsonConfig is it's not an empty string, then by checking if
+// PORT or LOGFILE environment variables are set. NOTE: if a given setting is appears in both json and environment,
+// environment value is used.
+//
+// Default Port = "8080"
+// Default LogFile = "" (no logging).
+//
+// Set LogFile = "-" to log to stdout, otherwise provide
+// a valid file name. If LogFile cannot be accessed and parsed, a warning is printed and
+// execution continues with either environment values or defaults.
+func GetConfig(jsonConfig string) config {
 	var cfg config
-	var fname string
 
-	// get config from commandline first, fallback to try environment
-	if len(os.Args) > 2 {
-		fname = os.Args[1]
-	} else {
-		fname = os.Getenv("CONFIG")
-	}
-
-	if fname != "" {
-		f, err := os.Open(fname)
+	if jsonConfig != "" {
+		f, err := os.Open(jsonConfig)
 		if err == nil {
 			defer f.Close()
 			err := json.NewDecoder(f).Decode(&cfg)
 			if err != nil {
-				fmt.Printf("Warning: can't parse config file %v (ignoring): %v", fname, err.Error())
+				fmt.Printf("Warning: can't parse config file %v (ignoring): %v", jsonConfig, err.Error())
 			}
 		} else {
-			fmt.Printf("Warning: can't open config file %v (ignoring): %v", fname, err.Error())
+			fmt.Printf("Warning: can't open config file %v (ignoring): %v", jsonConfig, err.Error())
 		}
 	}
 
