@@ -10,7 +10,8 @@ import (
 )
 
 const EXENAME = "wordless"
-const VERSION = "v1.6"
+const VERSION = "1.7"
+const HTTP_VER_HEADER = "X-wordless-api-version"
 
 func main() {
 	helpSwitches := []string{"--help", "-h", "/?"}

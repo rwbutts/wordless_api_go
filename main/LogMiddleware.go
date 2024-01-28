@@ -48,6 +48,7 @@ func LoggingMiddleware(logger *log.Logger) func(http.Handler) http.Handler {
 
 			wrw := wrapResponseWriter(w)
 
+			wrw.Header().Set(HTTP_VER_HEADER, VERSION)
 			next.ServeHTTP(wrw, r)
 
 			logger.Printf("%v %03d %v %v %v",
