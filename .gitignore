@@ -1,5 +1,4 @@
 /main/main
-**/wwwroot/*
 __debug*
 log.*
 /bin/
