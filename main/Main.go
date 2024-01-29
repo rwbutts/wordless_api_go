@@ -10,7 +10,7 @@ import (
 )
 
 const EXENAME = "wordless"
-const VERSION = "1.7.3"
+const VERSION = "1.7.4"
 const HTTP_VER_HEADER = "X-wordless-api-version"
 
 func main() {
