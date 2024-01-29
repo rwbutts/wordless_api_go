@@ -1,3 +1,4 @@
+steps:
 # Build the container image
 # docker build -t gcr.io/wordless-412000/github.com/rwbutts/wordless_api_go:$COMMIT_SHA -f Dockerfile 
 - name: 'gcr.io/cloud-builders/docker'
