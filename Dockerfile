@@ -10,7 +10,6 @@ COPY go.* ./
 COPY /main/* /app/main/
 COPY /words/* /app/words/
 #COPY /wwwroot/ /wwwroot/
-COPY --from=vue-app-dist /dist/ /wwwroot/
 RUN go mod download
 
 
@@ -26,7 +25,7 @@ FROM gcr.io/distroless/base-debian11 AS build-release-stage
 WORKDIR /
 
 COPY --from=build-stage /wordless /wordless
-COPY --from=build-stage /wwwroot/ /wwwroot/
+COPY --from=vue-app-dist /dist/ /wwwroot/
 
 EXPOSE 8080
 
