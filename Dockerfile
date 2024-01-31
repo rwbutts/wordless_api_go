@@ -1,4 +1,5 @@
 # syntax=docker/dockerfile:1
+FROM us-docker.pkg.dev/wordless-412000/wordless-app-dist/wordless-app-dist-prod:2.5.1 AS vue-app-dist
 
 # Build the application from source
 FROM golang:1.21 AS build-stage
@@ -8,7 +9,8 @@ COPY go.* ./
 
 COPY /main/* /app/main/
 COPY /words/* /app/words/
-copy /wwwroot/ /wwwroot/
+#COPY /wwwroot/ /wwwroot/
+COPY --from=vue-app-dist /dist/ /wwwroot/
 RUN go mod download
 
 
