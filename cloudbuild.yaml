@@ -1,14 +1,19 @@
 steps:
-# Build the container image
-# docker build -t gcr.io/wordless-412000/github.com/rwbutts/wordless_api_go:$COMMIT_SHA -f Dockerfile 
+# Build the container image, push to Artifacts, and push to the Cloud Run service
+
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'gcr.io/$PROJECT_ID/github.com/rwbutts/wordless_api_go:$COMMIT_SHA', '.']
-# Push the container image to Container Registry
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/github.com/rwbutts/wordless_api_go:$TAG_NAME',  
+        '-t', 'gcr.io/$PROJECT_ID/github.com/rwbutts/wordless_api_go:latest', '.']
+        
+# Push the container image to Container Registry, with tag and "latest" tag too.
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'gcr.io/$PROJECT_ID/github.com/rwbutts/wordless_api_go:$COMMIT_SHA']
+  args: ['push', 'gcr.io/$PROJECT_ID/github.com/rwbutts/wordless_api_go:$TAG_NAME']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/github.com/rwbutts/wordless_api_go:latest']
+
 # Deploy container image to Cloud Run
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   entrypoint: gcloud
-  args: ['run', 'deploy', 'wordless-go', '--image', 'gcr.io/$PROJECT_ID/github.com/rwbutts/wordless_api_go:$COMMIT_SHA', '--region', 'us-east4']
+  args: ['run', 'deploy', 'wordless-go', '--image', 'gcr.io/$PROJECT_ID/github.com/rwbutts/wordless_api_go:$TAG_NAME', '--region', 'us-east4']
 images:
-- gcr.io/$PROJECT_ID/github.com/rwbutts/wordless_api_go:$COMMIT_SHA
+- gcr.io/$PROJECT_ID/github.com/rwbutts/wordless_api_go:$TAG_NAME
