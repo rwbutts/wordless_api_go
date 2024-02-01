@@ -24,9 +24,3 @@ WORKDIR /
 
 COPY --from=build-stage /wordless /wordless
 
-EXPOSE 8080
-
-USER nonroot:nonroot
-
-ENTRYPOINT ["/wordless"]
-
