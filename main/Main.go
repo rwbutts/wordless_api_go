@@ -10,7 +10,10 @@ import (
 )
 
 const EXENAME = "wordless"
-const VERSION = "1.7.7"
+
+// value is set at compile time in the Dockerfile
+var VERSION string
+
 const HTTP_VER_HEADER = "X-wordless-api-version"
 
 func main() {
