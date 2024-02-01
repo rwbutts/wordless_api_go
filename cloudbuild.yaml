@@ -14,8 +14,8 @@ steps:
   args: ['push', 'gcr.io/$PROJECT_ID/github.com/rwbutts/wordless_api_go:latest']
 
 # Deploy container image to Cloud Run
-- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-  entrypoint: gcloud
-  args: ['run', 'deploy', 'wordless-go', '--image', 'gcr.io/$PROJECT_ID/github.com/rwbutts/wordless_api_go:$TAG_NAME', '--region', 'us-east4']
+#- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+#  entrypoint: gcloud
+#  args: ['run', 'deploy', 'wordless-go', '--image', 'gcr.io/$PROJECT_ID/github.com/rwbutts/wordless_api_go:$TAG_NAME', '--region', 'us-east4']
 images:
 - gcr.io/$PROJECT_ID/github.com/rwbutts/wordless_api_go:$TAG_NAME
