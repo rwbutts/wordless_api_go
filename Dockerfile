@@ -8,11 +8,11 @@ ARG TAG_NAME='0.0.0'
 
 WORKDIR /app
 COPY go.* ./
+RUN go mod download
 
 COPY /main/* /app/main/
 COPY /words/* /app/words/
 #COPY /wwwroot/ /wwwroot/
-RUN go mod download
 
 
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags "-X main.VERSION=${TAG_NAME}" -o /wordless ./main
