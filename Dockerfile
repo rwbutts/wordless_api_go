@@ -4,7 +4,7 @@
 # Build the application from source
 FROM golang:1.21 AS build-stage
 
-ARG TAG_NAME='0.0.0'
+ARG TAG_VERSION='0.0.0'
 
 WORKDIR /app
 COPY go.* ./
@@ -15,7 +15,7 @@ COPY /words/* /app/words/
 #COPY /wwwroot/ /wwwroot/
 
 
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags "-X main.VERSION=${TAG_NAME}" -o /wordless ./main
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags "-X main.VERSION=${TAG_VERSION}" -o /wordless ./main
 
 # Deploy the application binary into a lean image
 FROM scratch

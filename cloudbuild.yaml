@@ -2,21 +2,29 @@ steps:
 # Build the container image, push to Artifacts, and push to the Cloud Run service
 
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'gcr.io/$PROJECT_ID/github.com/rwbutts/wordless_api_go:$TAG_NAME',  
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/github.com/rwbutts/wordless_api_go:$_TAG_VERSION',  
         '-t', 'gcr.io/$PROJECT_ID/github.com/rwbutts/wordless_api_go:latest', 
-        '--cache-from', 'gcr.io/$PROJECT_ID/github.com/rwbutts/wordless_api_go:latest', 
-        '--build-arg', 'TAG_NAME=$TAG_NAME',
+#        '--cache-from', 'gcr.io/$PROJECT_ID/github.com/rwbutts/wordless_api_go:latest', 
+        '--build-arg', 'TAG_VERSION=$_TAG_VERSION',
         '.']
         
 # Push the container image to Container Registry, with tag and "latest" tag too.
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'gcr.io/$PROJECT_ID/github.com/rwbutts/wordless_api_go:$TAG_NAME']
+  args: ['push', 'gcr.io/$PROJECT_ID/github.com/rwbutts/wordless_api_go:$_TAG_VERSION']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['push', 'gcr.io/$PROJECT_ID/github.com/rwbutts/wordless_api_go:latest']
+
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  script:  |
+    #!/usr/bin/env bash
+    if [[ $_TAG_ACTION == 'deploy' ]]; then
+      echo gcloud builds triggers run go-server-deployed-app --region=us-west2
+      gcloud builds triggers run go-server-deployed-app --region=us-west2
+    fi
 
 # Deploy container image to Cloud Run
 #- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
 #  entrypoint: gcloud
 #  args: ['run', 'deploy', 'wordless-go', '--image', 'gcr.io/$PROJECT_ID/github.com/rwbutts/wordless_api_go:$TAG_NAME', '--region', 'us-east4']
 images:
-- gcr.io/$PROJECT_ID/github.com/rwbutts/wordless_api_go:$TAG_NAME
+- gcr.io/$PROJECT_ID/github.com/rwbutts/wordless_api_go:$_TAG_VERSION
