@@ -31,6 +31,6 @@ images:
 - gcr.io/$PROJECT_ID/github.com/rwbutts/wordless_api_go:$_TAG_VERSION
 options:
   dynamic_substitutions : true
-  env:
-  - '_TAG_VERSION=$_TAG_VERSION'
-  - '_TAG_ACTION=$_TAG_ACTION'
+  #env:
+  #- '_TAG_VERSION=$_TAG_VERSION'
+  #- '_TAG_ACTION=$_TAG_ACTION'
