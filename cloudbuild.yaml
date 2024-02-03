@@ -17,8 +17,8 @@ steps:
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   script:  |
     #!/usr/bin/env bash
-    echo _TAG_ACTION = $_TAG_ACTION
-    if [ "$_TAG_ACTION" = "deploy" ]; then
+    echo _TAG_ACTION = ${_TAG_ACTION}
+    if [ "${_TAG_ACTION}" = "deploy" ]; then
       echo gcloud builds triggers run go-server-deployed-app --region=us-west2
       gcloud builds triggers run go-server-deployed-app --region=us-west2
     fi
@@ -29,3 +29,8 @@ steps:
 #  args: ['run', 'deploy', 'wordless-go', '--image', 'gcr.io/$PROJECT_ID/github.com/rwbutts/wordless_api_go:$TAG_NAME', '--region', 'us-east4']
 images:
 - gcr.io/$PROJECT_ID/github.com/rwbutts/wordless_api_go:$_TAG_VERSION
+options:
+  dynamic_substitutions : true
+  env:
+  - '_TAG_VERSION=$_TAG_VERSION'
+  - '_TAG_ACTION=$_TAG_ACTION'
