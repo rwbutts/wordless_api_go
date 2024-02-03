@@ -17,7 +17,8 @@ steps:
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   script:  |
     #!/usr/bin/env bash
-    if [[ $_TAG_ACTION == 'deploy' ]]; then
+    echo _TAG_ACTION = $_TAG_ACTION
+    if [ "$_TAG_ACTION" = "deploy" ]; then
       echo gcloud builds triggers run go-server-deployed-app --region=us-west2
       gcloud builds triggers run go-server-deployed-app --region=us-west2
     fi
